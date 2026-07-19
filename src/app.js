@@ -5,7 +5,9 @@ app.get("/user", (req, res) => {
     res.send({ firstName: "Sugam", lastName: "Parmar" });
 });
 
-app.get("/test", (req, res) => {
+app.get("/test/:userId/:name/:password", (req, res) => {
+    console.log(req.params)
+    console.log(req.query)
     res.send("Hello From the Server");
 });
 
