@@ -1,22 +1,26 @@
 const express = require('express');
 const app = express();
 
-app.get("/user", (req, res) => {
+
+// const { adminAuth , userAuth } = require('./middlewares/');
+
+// app.use("/admin", adminAuth);
+
+app.get("/admin/data", (req, res) => {
     res.send({ firstName: "Sugam", lastName: "Parmar" });
 });
 
-app.get("/test/:userId/:name/:password", (req, res) => {
-    console.log(req.params)
-    console.log(req.query)
-    res.send("Hello From the Server");
-});
-
-app.post("/user", (req,res) => {
-//    saving data to the database logic goes here
-
-    res.send("Post Request Received");
+app.get("/user/login", (req, res) => {
+throw new Error("User login failed");
+res.send({ message: "User login successful" });
 })
 
+
+app.use("/", (err,req, res, next) => {
+    if(err) {
+        res.status(500).send("Internal Server Error");zz
+    }
+})
 
 
 app.listen(7777, () => {
