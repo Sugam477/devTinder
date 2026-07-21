@@ -6,9 +6,7 @@ const User = require('./models/user')
 app.use(express.json());
 
 app.post("/signup", async (req,res) => {
-
 const userObj = req.body;
-
 // // Creating a new instance of the User model
 const user = new User(userObj)
 try{
@@ -17,10 +15,19 @@ res.send("User added successfully !")
 }catch(err){
     res.status(400).send("Error saving the user:"+ err.message)
 }
-
 })
 
+//  Feed API - GET  /feed  - get all the users from the database
 
+app.get("/feed", async (req, res) =>  {
+   try{
+const users = await User.find({});
+res.send(users);
+   }
+    catch(err){
+        res.status(400).send("Error fetching the user:"+ err.message)
+    }
+})
 
 
 connectDB().then(() => {
