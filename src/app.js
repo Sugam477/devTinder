@@ -29,6 +29,45 @@ res.send(users);
     }
 })
 
+app.get("/userId", async (req, res) =>  {
+    const userId = req.body._id;
+   try{
+const users = await User.findById(userId);
+res.send(users);
+   }
+    catch(err){
+        res.status(400).send("Error fetching the user:"+ err.message)
+    }
+})
+
+
+app.delete("/user", async (req, res) =>  {
+    const userId = req.body.userId;
+   try{
+const users = await User.findByIdAndDelete(userId);
+res.send("User deleted successfully");
+   }
+    catch(err){
+        res.status(400).send("Error fetching the user:"+ err.message)
+    }
+})
+
+
+app.patch("/user", async (req, res) =>  {
+    const userId = req.body.userId;
+    const data = req.body;
+   try{
+await User.findByIdAndUpdate({_id: userId}, data);
+res.send("User updated successfully");
+   }
+    catch(err){
+        res.status(400).send("Error fetching the user:"+ err.message)
+    }
+})
+
+
+
+
 
 connectDB().then(() => {
     console.log("Database connected successfully");
