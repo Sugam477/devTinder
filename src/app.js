@@ -53,11 +53,21 @@ res.send("User deleted successfully");
 })
 
 
-app.patch("/user", async (req, res) =>  {
-    const userId = req.body.userId;
+app.patch("/user/:userId", async (req, res) =>  {
+    const userId = req.params?.userId;
     const data = req.body;
+
    try{
-await User.findByIdAndUpdate({_id: userId}, data,{
+
+const ALLOWED_UPDATES = ["age", "gender", "photoUrl", "about", "skills"];
+const isUpdateAllowed = Object.keys(data).every((k) => ALLOWED_UPDATES.includes(k)); 
+if(!isUpdateAllowed){
+    throw new Error("Invalid updates");
+}
+if(data.skills.length > 5){
+    throw new Error("Skills cannot be more than 5");
+}
+const user =await User.findByIdAndUpdate({_id: userId}, data,{
     runValidators: true,
 });
 res.send("User updated successfully");
