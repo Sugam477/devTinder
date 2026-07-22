@@ -1,54 +1,70 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
+const validator = require("validator");
 
-const userSchema = mongoose.Schema({
+const userSchema = mongoose.Schema(
+  {
     firstName: {
-        type: String,
-        required: true,
-        minLength: 4,
+      type: String,
+      required: true,
+      minLength: 4,
     },
     lastName: {
-        type: String
+      type: String,
     },
     emailId: {
-        type: String,
-        required: true,
-        unique: true,
-        lowercase: true,
-        trim: true,
-
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+      trim: true,
+      validate(value) {
+        if (!validator.isEmail(value)) {
+          throw new Error("Invalid email address" + value);
+        }
+      },
     },
-    password: {
-        type: String,
-        required: true,
 
+    password: {
+      type: String,
+      required: true,
+          validate(value) {
+        if (!validator.isStrongPassword(value)) {
+          throw new Error("Password is not strong enough" + value);
+        }
+      },
     },
     age: {
-        type: Number,
-        min: 18,
+      type: Number,
+      min: 18,
     },
     gender: {
-        type: String,
-        validate(value) {
-            if (!["male", "female", "other"].includes(value)) {     
-                throw new Error("Gender must be either male, female, or other");
-            }
+      type: String,
+      validate(value) {
+        if (!["male", "female", "other"].includes(value)) {
+          throw new Error("Gender must be either male, female, or other");
         }
+      },
     },
     photoUrl: {
-        type: String
+      type: String,
+      validate(value) {
+        if (!validator.isURL(value)) {
+          throw new Error("Invalid URL" + value);
+        }
+      },
     },
     about: {
-        type: String,
-        default: "This is a default about me description."
+      type: String,
+      default: "This is a default about me description.",
     },
     skills: {
-        type: [String]
+      type: [String],
     },
-},
-{
-    timestamps : true
-});
+  },
 
+  {
+    timestamps: true,
+  },
+);
 
-
-module.exports = mongoose.model('User', userSchema);
+module.exports = mongoose.model("User", userSchema);
