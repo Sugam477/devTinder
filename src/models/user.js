@@ -1,7 +1,8 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
 const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
+const jwt = require("jsonwebtoken"); // For generating and verifying JWT tokens
+
 
 const userSchema = mongoose.Schema(
   {
