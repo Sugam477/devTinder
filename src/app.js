@@ -6,6 +6,7 @@ const jwt = require("jsonwebtoken"); // For generating and verifying JWT tokens
 const connectDB = require("./config/database");
 const User = require("./models/user");
 const { validateSignupData } = require("./utils/validation");
+const { userAuth } = require("./middlewares/auth"); // Import the userAuth middleware
 
 app.use(express.json());
 app.use(cookieParser()); // Use the cookie parser middleware
@@ -40,10 +41,11 @@ app.post("/login", async (req, res) => {
     if (!user) {
       throw new Error("Invalid credentials");
     }
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    const isPasswordValid = await user.validatePassword(password); // Call the validatePassword method on the user instance to check if the password is valid
     if (isPasswordValid) {
       //  Create a JWT token
-      const token = await jwt.sign({ userId: user._id }, "mysecretkey");
+      const token = await user.getJWT(); // Call the getJWT method on the user instance to generate a token 
+
       //  Add the token to the Cookie and send it to the client
       res.cookie("token", token); //Express feature
       res.send("Login successful");
@@ -55,17 +57,9 @@ app.post("/login", async (req, res) => {
   }
 });
 
-app.get("/profile", async (req, res) => {
+app.get("/profile", userAuth, async (req, res) => {
   try {
-    const cookies = req.cookies;
-    const token = cookies.token;
-    if (!token) {
-      throw new Error("No token found in cookies");
-    }
-    // Validate my token
-    const decodedMessage = await jwt.verify(token, "mysecretkey");
-    const { userId } = decodedMessage;
-    const user = await User.findById(userId);
+    const user = req.user
     res.send(user);
   } catch (err) {
     res.status(400).send("ERROR :" + err.message);
