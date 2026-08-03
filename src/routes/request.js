@@ -3,6 +3,7 @@ const requestsRouter = express.Router();
 const { userAuth } = require("../middlewares/auth"); // Import the userAuth middleware
 const ConnectionRequest = require("../models/connectionRequest"); // Import the ConnectionRequest model
 const User = require("../models/user"); // Import the User model
+
 requestsRouter.post(
   "/request/send/:status/:toUserId",
   userAuth,
@@ -49,10 +50,42 @@ requestsRouter.post(
       });
       const data = await connectionRequest.save();
       res.json({
-
         message: "Connection request sent successfully",
         data: data,
       });
+    } catch (err) {
+      res.status(400).send("ERROR: " + err.message);
+    }
+  },
+);
+
+requestsRouter.post(
+  "/request/review/:status/:requestId",
+  userAuth,
+  async (req, res) => {
+    try {
+      const loggedInUser = req.user; // Get the authenticated user's ID from the request
+      const { status, requestId } = req.params;
+      const allowedStatus = ["accepted", "rejected"];
+      if (!allowedStatus.includes(status)) {
+        return res.status(400).json({ message: "Status not allowed" });
+      }
+const connectionRequest = await ConnectionRequest.findOne({
+_id: requestId,
+toUserId: loggedInUser._id,
+status: "interested",
+});
+if(!connectionRequest) {
+return res.status(404).json({ message: "Connection request not found or already reviewed" });
+}
+connectionRequest.status = status;
+const data = await connectionRequest.save();
+res.json({
+message: "Connection request is " + status + " successfully",
+data: data,
+});
+
+      
     } catch (err) {
       res.status(400).send("ERROR: " + err.message);
     }
