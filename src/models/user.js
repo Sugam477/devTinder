@@ -32,11 +32,8 @@ const userSchema = mongoose.Schema(
     password: {
       type: String,
       required: true,
-          validate(value) {
-        if (!validator.isStrongPassword(value)) {
-          throw new Error("Password is not strong enough" + value);
-        }
-      },
+      // NOTE: strength is validated on the plaintext password in
+      // utils/validation.js — the value stored here is a bcrypt hash.
     },
     age: {
       type: Number,
