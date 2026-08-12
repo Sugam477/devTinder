@@ -42,7 +42,7 @@ authRouter.post("/login", async (req, res) => {
 
       //  Add the token to the Cookie and send it to the client
       res.cookie("token", token); //Express feature
-      res.send("Login successful");
+      res.send(user);
     } else {
       throw new Error("Invalid credentials");
     }

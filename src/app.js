@@ -2,7 +2,9 @@ const express = require("express");
 const app = express();
 const cookieParser = require("cookie-parser"); // Middleware to parse cookies
 const connectDB = require("./config/database");
+const cors = require("cors");
 
+app.use(cors())
 app.use(express.json());
 app.use(cookieParser()); // Use the cookie parser middleware
 
