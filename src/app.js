@@ -4,7 +4,12 @@ const cookieParser = require("cookie-parser"); // Middleware to parse cookies
 const connectDB = require("./config/database");
 const cors = require("cors");
 
-app.use(cors())
+app.use(cors(
+  {
+    origin: "http://localhost:5173", // React frontend URL
+    credentials:true, // Allow credentials (cookies) to be sent
+  }
+));
 app.use(express.json());
 app.use(cookieParser()); // Use the cookie parser middleware
 
