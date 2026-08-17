@@ -5,7 +5,7 @@ const User = require("../models/user");
         try {
        const { token } = req.cookies;
        if (!token) {
-         throw new Error("Token is not valid or not found in cookies");
+         return res.status(401).json("Please Login!");
        }
        const decodedObj = await jwt.verify(token, "mysecretkey");
        const {_id} = decodedObj;
