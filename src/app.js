@@ -1,3 +1,16 @@
+require("dotenv").config({ quiet: true }); // Load .env before anything else reads process.env
+
+// Stop early with a clear message if required configuration is missing
+const REQUIRED_ENV_VARS = ["MONGODB_URI", "JWT_SECRET", "CLIENT_URL"];
+const missingEnvVars = REQUIRED_ENV_VARS.filter((name) => !process.env[name]);
+if (missingEnvVars.length > 0) {
+  console.error(
+    `Missing required environment variable(s): ${missingEnvVars.join(", ")}. ` +
+      "Copy .env.example to .env and fill in the values.",
+  );
+  process.exit(1);
+}
+
 const express = require("express");
 const app = express();
 const cookieParser = require("cookie-parser"); // Middleware to parse cookies
@@ -6,7 +19,7 @@ const cors = require("cors");
 
 app.use(cors(
   {
-    origin: "http://localhost:5173", // React frontend URL
+    origin: process.env.CLIENT_URL, // React frontend URL
     credentials:true, // Allow credentials (cookies) to be sent
   }
 ));

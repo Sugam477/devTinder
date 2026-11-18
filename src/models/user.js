@@ -70,11 +70,21 @@ const userSchema = mongoose.Schema(
 
   {
     timestamps: true,
+    // Never send the password hash to the client. The field is still loaded
+    // from the DB (so validatePassword works); it is only removed when the
+    // document is converted to JSON for a response.
+    toJSON: {
+      transform: (doc, ret) => {
+        delete ret.password;
+        return ret;
+      },
+    },
   },
 );
 userSchema.methods.getJWT = async function () {
   const user = this;
-  const token = await jwt.sign({ _id: user._id }, "mysecretkey", { expiresIn: "1h" });
+  // Keep "1h" in sync with the cookie maxAge in routes/auth.js
+  const token = await jwt.sign({ _id: user._id }, process.env.JWT_SECRET, { expiresIn: "1h" });
   return token;
 };
 userSchema.methods.validatePassword = async function (passwordInputByUser) {

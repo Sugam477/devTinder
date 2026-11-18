@@ -4,6 +4,15 @@ const { validateSignupData } = require("../utils/validation");
 const User = require("../models/user");
 const bcrypt = require("bcrypt");
 
+// Cookie settings for the JWT. maxAge matches the JWT expiresIn ("1h") in models/user.js.
+const isProduction = process.env.NODE_ENV === "production";
+const tokenCookieOptions = {
+  httpOnly: true, // JavaScript in the browser cannot read the token
+  secure: isProduction, // HTTPS-only in production; plain http allowed on localhost
+  sameSite: "lax", // Not sent on cross-site POSTs (CSRF protection)
+  maxAge: 60 * 60 * 1000, // 1 hour, same as the JWT
+};
+
 authRouter.post("/signup", async (req, res) => {
   try {
     //  Validation of data
@@ -25,7 +34,7 @@ authRouter.post("/signup", async (req, res) => {
        //  Create a JWT token
       const token = await savedUser.getJWT(); // Call the getJWT method on the user instance to generate a token
       //  Add the token to the Cookie and send it to the client
-      res.cookie("token", token, {expires: new Date(Date.now() + 8 * 3600000)}); //Express feature
+      res.cookie("token", token, tokenCookieOptions); //Express feature
     res.json({message: "User added successfully !", data: savedUser});
   } catch (err) {
     res.status(400).send("ERROR :" + err.message);
@@ -45,7 +54,7 @@ authRouter.post("/login", async (req, res) => {
       const token = await user.getJWT(); // Call the getJWT method on the user instance to generate a token
 
       //  Add the token to the Cookie and send it to the client
-      res.cookie("token", token, {expires: new Date(Date.now() + 8 * 3600000)}); //Express feature
+      res.cookie("token", token, tokenCookieOptions); //Express feature
       res.send(user);
     } else {
       throw new Error("Invalid credentials");
